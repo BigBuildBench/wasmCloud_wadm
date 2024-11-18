@@ -1,0 +1,15 @@
+[package]
+name = "wadm-types"
+description = "Types and validators for the wadm API"
+version = "0.5.0"
+edition = "2021"
+authors = ["wasmCloud Team"]
+keywords = ["webassembly", "wasmcloud", "wadm"]
+license = "Apache-2.0"
+repository = "https://github.com/wasmcloud/wadm"
+
+[features]
+default = []
+wit = ["wit-bindgen-wrpc"]
+
+[dependencies]

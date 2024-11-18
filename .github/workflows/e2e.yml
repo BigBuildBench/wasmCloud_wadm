@@ -1,0 +1,55 @@
+name: e2e Tests Wadm
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: e2e
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # TODO: Re-enable the multitenant and upgrades tests in followup to #247
+        # test: [e2e_multiple_hosts, e2e_multitenant, e2e_upgrades]
+        test: [e2e_multiple_hosts, e2e_upgrades]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install latest Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+
+      # Cache: rust
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: 'ubuntu-22.04-rust-cache'
+
+      # If the test uses a docker compose file, pre-emptively pull images used in docker compose
+      - name: Pull images for test ${{ matrix.test }}
+        shell: bash
+        run: |
+          export DOCKER_COMPOSE_FILE=tests/docker-compose-${{ matrix.test }}.yaml;
+          [[ -f "$DOCKER_COMPOSE_FILE" ]] && docker compose -f $DOCKER_COMPOSE_FILE pull;
+
+      # Run e2e tests in a matrix for efficiency
+      - name: Run tests ${{ matrix.test }}
+        id: test
+        env:
+          WADM_E2E_TEST: ${{ matrix.test }}
+        run: make test-individual-e2e
+
+      # if the previous step fails, upload logs
+      - name: Upload logs for debugging
+        uses: actions/upload-artifact@v4
+        if: ${{ failure() && steps.test.outcome == 'failure' }}
+        with:
+          name: e2e-logs-${{ matrix.test }}
+          path: ./tests/e2e_log/*
+          # Be nice and only retain the logs for 7 days
+          retention-days: 7

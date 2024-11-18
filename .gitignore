@@ -1,0 +1,11 @@
+/target
+tests/e2e_log/
+
+*.dump
+
+# Thanks MacOS
+.DS_Store
+
+# Ignore IDE specific files
+.idea/
+.vscode/

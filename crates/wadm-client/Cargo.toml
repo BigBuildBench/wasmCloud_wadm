@@ -1,0 +1,11 @@
+[package]
+name = "wadm-client"
+description = "A client library for interacting with the wadm API"
+version = "0.5.0"
+edition = "2021"
+authors = ["wasmCloud Team"]
+keywords = ["webassembly", "wasmcloud", "wadm"]
+license = "Apache-2.0"
+repository = "https://github.com/wasmcloud/wadm"
+
+[dependencies]
